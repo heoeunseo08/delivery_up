@@ -13,7 +13,7 @@ class AppScreen extends StatefulWidget {
 }
 
 class _AppScreenState extends State<AppScreen> {
-  int selectIndex = 0;
+  int selectIndex = 3;
 
   List<Widget> pages = [
     HomeScreen(),

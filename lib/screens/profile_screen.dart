@@ -11,6 +11,12 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -24,20 +30,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(width: MediaQuery.widthOf(context)),
-          noLogin()
-        ],
-      ),
+      body: !isLogin
+          ? noLogin()
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: MediaQuery.widthOf(context)),
+                Center(
+                  child: Text("profiles"),
+                ),
+              ],
+            ),
     );
   }
 
   Widget noLogin() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        SizedBox(width: MediaQuery.widthOf(context)),
         Image.asset("assets/images/default_profile.png", width: 80),
         SizedBox(height: 15),
         Text(
@@ -61,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         GestureDetector(
           onTap: () => showLogin(context),
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 80),
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 70),
             decoration: BoxDecoration(
               color: mainColor,
               borderRadius: BorderRadius.circular(12),
@@ -78,5 +91,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> init() async {
+    setState(() {});
   }
 }
