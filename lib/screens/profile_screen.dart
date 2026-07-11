@@ -1,3 +1,4 @@
+import 'package:delivery_up/screens/login_sheet.dart';
 import 'package:delivery_up/utils/info.dart';
 import 'package:flutter/material.dart';
 
@@ -57,18 +58,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         SizedBox(height: 15),
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 80),
-          decoration: BoxDecoration(
-            color: mainColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            "로그인",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
+        GestureDetector(
+          onTap: () => showLogin(context),
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 80),
+            decoration: BoxDecoration(
+              color: mainColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              "로그인",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),
