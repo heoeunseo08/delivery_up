@@ -1,3 +1,5 @@
+import 'package:delivery_up/controller/auth_controller.dart';
+import 'package:delivery_up/controller/method_controller.dart';
 import 'package:delivery_up/controller/profile_controller.dart';
 import 'package:delivery_up/screens/login_sheet.dart';
 import 'package:delivery_up/utils/info.dart';
@@ -12,6 +14,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   ProfileController profileController = ProfileController();
+  AuthController authController = AuthController();
 
   @override
   void initState() {
@@ -46,6 +49,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 SizedBox(width: MediaQuery.widthOf(context)),
                 infoWidget(),
+                SizedBox(height: 20),
+                logoutText()
               ],
             ),
     );
@@ -106,7 +111,124 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget logItem(String title, String text) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+              color: Colors.black,
+            ),
+          ),
+          Text(
+            text,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget logoutText() {
+    return GestureDetector(
+      onTap: () => logoutPopup(),
+      child: Text(
+        "로그아웃",
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  void logoutPopup() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        alignment: Alignment.center,
+        title: Text(
+          "로그아웃",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        content: Text(
+          "정말 로그아웃 하시겠어요?",
+          style: TextStyle(
+            color: subColor,
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          ),
+        ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 45),
+                  decoration: BoxDecoration(
+                    color: subColor.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    "취소",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 20),
+              GestureDetector(
+                onTap: () async{
+                  await authController.logout();
+                  showMessage("로그아웃 되었습니다.");
+                  setState(() {
+
+                  });
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 45),
+                  decoration: BoxDecoration(
+                    color: mainColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    "확인",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+        ],
+      ),
+    );
+  }
 
   Widget noLogin() {
     return Column(
@@ -138,7 +260,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           onTap: () async {
             await showLogin(context);
             await load();
-            setState(() {});
           },
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 16, horizontal: 70),
