@@ -16,7 +16,7 @@ class AuthController {
       final res = await http.post(
         Uri.parse("$baseUrl/auth/login"),
         headers: {"Content-Type": "application/json"},
-        body: {"email": emailText, "password": passwordText},
+        body: jsonEncode({"email": emailText, "password": passwordText}),
       );
 
       print("stats : ${res.statusCode}");

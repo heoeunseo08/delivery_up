@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-String baseUrl = "http://127.0.0.1:8080";
+String baseUrl = "http://10.0.2.2:8080";
 String tkn = "";
 
 bool get isLogin => tkn.isNotEmpty;

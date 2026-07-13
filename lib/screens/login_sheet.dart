@@ -49,12 +49,12 @@ class _LoginSheetState extends State<LoginSheet> {
             text: "로그인",
             onTap: () async {
               final authController = AuthController();
-              final error = authController.error;
 
-              if (error != null) {
-                log(error);
+              if (authController.error != null) {
+                log("${authController.error}");
                 return;
               }
+              print("object");
 
               final success = await authController.login(
                 emailText: emailController.text.trim(),
@@ -63,9 +63,9 @@ class _LoginSheetState extends State<LoginSheet> {
 
               if (success) {
                 Navigator.pop(context);
+              } else {
+                Navigator.pop(context);
               }
-
-              Navigator.pop(context);
             },
           ),
           SizedBox(height: 24),
@@ -123,7 +123,7 @@ class _LoginSheetState extends State<LoginSheet> {
   }
 }
 
-void showLogin(BuildContext context) {
+Future<void> showLogin(BuildContext context) async {
   showModalBottomSheet(
     context: context,
     builder: (context) => LoginSheet(),

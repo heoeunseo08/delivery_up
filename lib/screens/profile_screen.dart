@@ -1,3 +1,4 @@
+import 'package:delivery_up/controller/profile_controller.dart';
 import 'package:delivery_up/screens/login_sheet.dart';
 import 'package:delivery_up/utils/info.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +11,17 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  ProfileController profileController = ProfileController();
+
   @override
   void initState() {
     super.initState();
-    init();
+    if (isLogin) load();
+  }
+
+  Future<void> load() async {
+    await profileController.load();
+    setState(() {});
   }
 
   @override
@@ -37,13 +45,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(width: MediaQuery.widthOf(context)),
-                Center(
-                  child: Text("profiles"),
-                ),
+                infoWidget(),
               ],
             ),
     );
   }
+
+  Widget infoWidget() {
+    return Column(
+      children: [
+        Image.asset(
+          "assets/images/default_profile.png",
+          height: 80,
+        ),
+        SizedBox(height: 14),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              name.value,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+            ),
+            SizedBox(width: 12),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(99),
+                color: subColor.withOpacity(0.2),
+              ),
+              child: Text(
+                grade.value,
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 14),
+        Text(
+          email.value,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: subColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget logWidget() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: subColor, width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [],
+      ),
+    );
+  }
+
+
 
   Widget noLogin() {
     return Column(
@@ -72,7 +135,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         SizedBox(height: 15),
         GestureDetector(
-          onTap: () => showLogin(context),
+          onTap: () async {
+            await showLogin(context);
+            await load();
+            setState(() {});
+          },
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 16, horizontal: 70),
             decoration: BoxDecoration(
@@ -91,9 +158,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
-  }
-
-  Future<void> init() async {
-    setState(() {});
   }
 }
