@@ -1,15 +1,49 @@
+import 'dart:developer';
+
 import 'package:delivery_up/controller/auth_controller.dart';
 import 'package:delivery_up/controller/method_controller.dart';
 import 'package:delivery_up/controller/profile_controller.dart';
+import 'package:delivery_up/screens/address_screen.dart';
+import 'package:delivery_up/screens/log_screen.dart';
 import 'package:delivery_up/screens/login_sheet.dart';
 import 'package:delivery_up/utils/info.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+Widget profileImage() {
+  return GestureDetector(
+    onTap: () => log("프로필 이미지 선택"),
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        Image.asset(
+          "assets/images/default_profile.png",
+          height: 80,
+        ),
+        Positioned(
+          right: 0,
+          bottom: 0,
+          child: Container(
+            width: 27,
+            height: 27,
+            decoration: BoxDecoration(
+              color: mainColor,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+            ),
+            child: Icon(Icons.camera_alt_outlined, color: Colors.white, size: 15),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
@@ -43,6 +77,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: !isLogin
           ? noLogin()
+          : profileController.isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -50,7 +88,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(width: MediaQuery.widthOf(context)),
                 infoWidget(),
                 SizedBox(height: 20),
-                logoutText()
+                logWidget(),
+                SizedBox(height: 20),
+                buttons(),
+                SizedBox(height: 20),
+                logoutText(),
               ],
             ),
     );
@@ -59,10 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget infoWidget() {
     return Column(
       children: [
-        Image.asset(
-          "assets/images/default_profile.png",
-          height: 80,
-        ),
+        profileImage(),
         SizedBox(height: 14),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -100,13 +139,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget logWidget() {
     return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        border: Border.all(color: subColor, width: 1.5),
-        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: subColor.withOpacity(0.4), width: 1.5),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [],
+        children: [
+          logItem("${profileController.profileModel.orderCount}", "주문"),
+          Container(color: subColor.withOpacity(0.4), height: 90, width: 2),
+          logItem("${profileController.profileModel.favoriteCount}", "찜"),
+          Container(color: subColor.withOpacity(0.4), height: 90, width: 2),
+          logItem("${profileController.profileModel.reviewCount}", "리뷰"),
+        ],
       ),
     );
   }
@@ -137,12 +183,104 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget buttons() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: [
+          buttonItem(
+            icons: Icons.location_on_outlined,
+            text: "배송지 관리",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddressScreen()),
+              );
+            },
+          ),
+          buttonItem(
+            icons: Icons.article_outlined,
+            text: "주문 내역",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LogScreen(),
+                ),
+              );
+            },
+          ),
+          buttonItem(
+            icons: Icons.headset_mic_outlined,
+            text: "고객 센터",
+            onTap: () async {
+              await launchUrl(Uri.parse("http://support.deliveryup.com/"));
+            },
+          ),
+          buttonItem(
+            icons: Icons.info_outline,
+            text: "앱 정보",
+            onTap: () => showMessage("준비 중입니다. "),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buttonItem({
+    required IconData icons,
+    required String text,
+    required GestureTapCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(width: 1.5, color: subColor.withOpacity(0.3)),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(
+                  icons,
+                  size: 30,
+                  color: subColor,
+                ),
+                SizedBox(width: 12),
+                Text(
+                  text,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 25,
+              color: subColor,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget logoutText() {
     return GestureDetector(
       onTap: () => logoutPopup(),
       child: Text(
         "로그아웃",
         style: TextStyle(
+          color: subColor,
           fontSize: 15,
           fontWeight: FontWeight.w600,
         ),
@@ -197,12 +335,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               SizedBox(width: 20),
               GestureDetector(
-                onTap: () async{
+                onTap: () async {
                   await authController.logout();
                   showMessage("로그아웃 되었습니다.");
-                  setState(() {
-
-                  });
+                  setState(() {});
                   Navigator.pop(context);
                 },
                 child: Container(
@@ -224,7 +360,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
-
         ],
       ),
     );
