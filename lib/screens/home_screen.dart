@@ -19,6 +19,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final categoryText = ["전체", '치킨', '분식', '카페', '한식'];
   final categoryCode = [null, 'CHICKEN', 'BUNSIK', 'CAFE', 'KOREAN'];
 
+  String get currentSortText =>
+      sortText[sortCode.indexOf(storeController.sort)];
+
   @override
   void initState() {
     super.initState();
@@ -84,8 +87,12 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {});
       },
       decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: subColor.withOpacity(0.2)),
+        ),
         filled: true,
-        fillColor: subColor.withOpacity(0.3),
+        fillColor: subColor.withOpacity(0.2),
         prefixIcon: Icon(Icons.search, size: 30, color: subColor),
         hint: hintTexts("가게·메뉴를 검색해보세요"),
       ),
@@ -107,8 +114,19 @@ class _HomeScreenState extends State<HomeScreen> {
           return Padding(
             padding: EdgeInsets.only(left: 8),
             child: FilterChip(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(99),
+              ),
+              selectedColor: mainColor,
+              backgroundColor: subColor.withOpacity(0.1),
+              showCheckmark: false,
               selected: select,
-              label: Text(categoryText[index]),
+              label: Text(
+                categoryText[index],
+                style: TextStyle(
+                  color: select ? Colors.white : Colors.black,
+                ),
+              ),
               onSelected: (value) async {
                 if (code == null) {
                   storeController.category.clear();
@@ -128,8 +146,87 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget sortWidget() {
-    return SizedBox(
-      width: 40,
+    return ValueListenableBuilder(
+      valueListenable: storeController.sortNotifier,
+      builder: (context, value, child) {
+        final filterText = storeController.category.isEmpty
+            ? "필터"
+            : "${storeController.category.length}개 선택됨";
+        return InkWell(
+          onTap: showSort,
+          child: Row(
+            children: [
+              Icon(Icons.article_outlined, color: subColor, size: 20),
+              SizedBox(width: 10),
+              Text(
+                "$currentSortText · ",
+                style: TextStyle(color: Colors.black),
+              ),
+              Text(
+                filterText,
+                style: TextStyle(
+                  color: storeController.category.isEmpty
+                      ? Colors.black
+                      : mainColor,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> showSort() async {
+    String tempSort = storeController.sort;
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => StatefulBuilder(
+          builder: (context, set) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(width: MediaQuery.widthOf(context)),
+                  SizedBox(height: 20),
+                  header(),
+                  titleText("정렬"),
+                  SizedBox(height: 8),
+                  ...List.generate(
+                    sortText.length,
+                    (index) {
+                      return RadioListTile(
+                        activeColor: mainColor,
+                        title: Text(sortText[index]),
+                        groupValue: tempSort,
+                        value: sortCode[index],
+                        onChanged: (value) => set(() => tempSort = value!),
+                      );
+                    },
+                  ),
+                SizedBox(height: 20),
+                  buttons(context: context, text: "적용하기", onTap: () async{
+                    if(tempSort == storeController.sort){
+                      Navigator.pop(context);
+                      return;
+                    }
+                    storeController.sort = tempSort;
+                    await storeController.loadList();
+                     Navigator.pop(context);
+                     setState(() {
+
+                     });
+                  }),
+                SizedBox(height: 50)
+                ],
+              ),
+            );
+          },
+        ),
     );
   }
 

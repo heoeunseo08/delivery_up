@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:delivery_up/model/store_detail_model.dart';
 import 'package:delivery_up/model/store_list_model.dart';
 import 'package:delivery_up/utils/info.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 class StoreController {
@@ -16,9 +17,12 @@ class StoreController {
 
   bool isHeart(int id) => hearts.contains(id);
 
-  String sort = "DEFAULT";
+  String get sort => sortNotifier.value;
   List<String> category = [];
   String? keyword;
+
+  final ValueNotifier<String> sortNotifier = ValueNotifier("DEFAULT");
+  set sort(String value) => sortNotifier.value = value;
 
   Future<void> setHeart(int storeId) async {
     final index = storeListModel.indexWhere((element) => element.id == storeId);
