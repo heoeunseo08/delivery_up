@@ -55,3 +55,9 @@ Widget buttons({
     ),
   );
 }
+
+Widget loadingWidget(){
+  return Center(
+    child: CircularProgressIndicator(),
+  );
+}

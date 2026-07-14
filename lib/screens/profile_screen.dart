@@ -1,6 +1,7 @@
-import 'dart:developer';
+import 'dart:io';
 
 import 'package:delivery_up/controller/auth_controller.dart';
+import 'package:delivery_up/controller/image_controller.dart';
 import 'package:delivery_up/controller/method_controller.dart';
 import 'package:delivery_up/controller/profile_controller.dart';
 import 'package:delivery_up/screens/address_screen.dart';
@@ -8,6 +9,7 @@ import 'package:delivery_up/screens/log_screen.dart';
 import 'package:delivery_up/screens/login_sheet.dart';
 import 'package:delivery_up/utils/info.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -17,42 +19,19 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-Widget profileImage() {
-  return GestureDetector(
-    onTap: () => log("프로필 이미지 선택"),
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        Image.asset(
-          "assets/images/default_profile.png",
-          height: 80,
-        ),
-        Positioned(
-          right: 0,
-          bottom: 0,
-          child: Container(
-            width: 27,
-            height: 27,
-            decoration: BoxDecoration(
-              color: mainColor,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2),
-            ),
-            child: Icon(Icons.camera_alt_outlined, color: Colors.white, size: 15),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
 class _ProfileScreenState extends State<ProfileScreen> {
   ProfileController profileController = ProfileController();
   AuthController authController = AuthController();
+  ImageController imageController = ImageController();
 
   @override
   void initState() {
     super.initState();
+    imageController.load().then(
+      (value) {
+        if (mounted) setState(() {});
+      },
+    );
     if (isLogin) load();
   }
 
@@ -78,9 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: !isLogin
           ? noLogin()
           : profileController.isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
+          ? logWidget()
           : Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -135,6 +112,79 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
+  }
+
+  Widget profileImage() {
+    final path = imageController.imagePath;
+    return GestureDetector(
+      onTap: () => imagePick(),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          path != null
+              ? CircleAvatar(radius: 40, backgroundImage: FileImage(File(path)))
+              : Image.asset(
+                  "assets/images/default_profile.png",
+                  height: 80,
+                ),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 27,
+              height: 27,
+              decoration: BoxDecoration(
+                color: mainColor,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: Icon(
+                Icons.camera_alt_outlined,
+                color: Colors.white,
+                size: 15,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> imagePick() async {
+final list = [
+      "카메라로 촬영",
+      "갤러리에서 선택",
+      if (imageController.imagePath != null) "프로필 사진 삭제",
+    ];
+
+    final pick = await showModalBottomSheet(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: list
+            .map(
+              (e) => GestureDetector(
+                onTap: () => Navigator.pop(context,e),
+                child: Container(
+                    width: MediaQuery.widthOf(context),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    alignment: Alignment.center,
+                    child: Text(e)),
+              ),
+            )
+            .toList(),
+      ),
+    );
+
+    if (pick == "프로필 사진 삭제") {
+      await imageController.remove();
+      setState(() {});
+      return;
+    }
+    await imageController.pick(
+      pick == "카메라로 촬영" ? ImageSource.camera : ImageSource.gallery,
+    );
+    setState(() {});
   }
 
   Widget logWidget() {

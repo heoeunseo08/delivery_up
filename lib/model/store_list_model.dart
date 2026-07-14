@@ -6,7 +6,7 @@ class StoreListModel {
   final int minOrderPrice;
   final int deliveryFee;
   final String category;
-  final bool favorite;
+  bool favorite;
 
   StoreListModel({
     required this.id,

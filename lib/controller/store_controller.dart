@@ -1,22 +1,93 @@
+import 'dart:convert';
+
 import 'package:delivery_up/model/store_detail_model.dart';
 import 'package:delivery_up/model/store_list_model.dart';
+import 'package:delivery_up/utils/info.dart';
+import 'package:http/http.dart' as http;
 
 class StoreController {
-  String? error;
   bool isListLoading = false;
   bool isDetailLoading = false;
-  List<StoreListModel>? storeListModel;
+  bool isHeartLoading = false;
+  List<StoreListModel> storeListModel = [];
   StoreDetailModel? detailModel;
 
-  Future<void> listLoad() async {
+  List<int> hearts = [];
+
+  bool isHeart(int id) => hearts.contains(id);
+
+  String sort = "DEFAULT";
+  List<String> category = [];
+  String? keyword;
+
+  Future<void> setHeart(int storeId) async {
+    final index = storeListModel.indexWhere((element) => element.id == storeId);
+    final current = storeListModel[index].favorite;
+
+    isHeartLoading = true;
+
+    try {
+      final uri = Uri.parse("$baseUrl/stores/$storeId/favorite?userId=$id");
+      final res = current
+          ? await http.delete(uri, headers: {"Authorization": "Bearer $tkn"})
+          : await http.post(uri, headers: {"Authorization": "Bearer $tkn"});
+
+      if (res.statusCode == 201 || res.statusCode == 200) {
+        final data = jsonDecode(res.body)['data']['favorite'];
+
+        storeListModel[index].favorite = data;
+        if (detailModel!.id == storeId && detailModel != null)
+          detailModel!.favorite = data;
+      }
+    } catch (e) {
+      print("오류 : $e");
+    }
+
+    isHeartLoading = false;
+  }
+
+  Future<void> loadList() async {
     isListLoading = true;
-    error = null;
 
-    try{
+    try {
+      final param = {
+        'sort': sort,
+        if (category.isNotEmpty) 'category': category.join(','),
+        if (keyword != null && keyword!.isNotEmpty) 'keyword': keyword,
+        'userId': id,
+      };
 
-    }catch(e){
+      final uri = Uri.parse("$baseUrl/stores").replace(queryParameters: param);
+      final res = await http.get(
+        uri,
+        headers: {"Authorization": "Bearer $tkn"},
+      );
+
+      print("$uri");
+      print(res.statusCode);
+      print(res.body);
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        storeListModel = (data['data'] as List)
+            .map((e) => StoreListModel.fromJson(e))
+            .toList();
+      }
+    } catch (e) {
       print("네트워크 오류: $e");
     }
     isListLoading = false;
+  }
+
+  Future<void> loadDetail(int storeId) async {
+    isDetailLoading = true;
+
+    try {
+      final uri = Uri.parse("$baseUrl/stores/$storeId?userId=$id");
+    } catch (e) {
+      print("오류 : $e");
+    }
+
+    isDetailLoading = false;
   }
 }
