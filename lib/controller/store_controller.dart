@@ -31,7 +31,7 @@ class StoreController {
     isHeartLoading = true;
 
     try {
-      final uri = Uri.parse("$baseUrl/stores/$storeId/favorite?userId=$id");
+      final uri = Uri.parse("$baseUrl/stores/$storeId/favorite?userId=${id.value}");
       final res = current
           ? await http.delete(uri, headers: {"Authorization": "Bearer $tkn"})
           : await http.post(uri, headers: {"Authorization": "Bearer $tkn"});
@@ -56,9 +56,9 @@ class StoreController {
     try {
       final param = {
         'sort': sort,
-        if (category.isNotEmpty) 'category': category.join(','),
+        if (category.isNotEmpty) 'categories': category.join(','),
         if (keyword != null && keyword!.isNotEmpty) 'keyword': keyword,
-        'userId': id,
+        'userId': "${id.value}",
       };
 
       final uri = Uri.parse("$baseUrl/stores").replace(queryParameters: param);
@@ -87,7 +87,7 @@ class StoreController {
     isDetailLoading = true;
 
     try {
-      final uri = Uri.parse("$baseUrl/stores/$storeId?userId=$id");
+      final uri = Uri.parse("$baseUrl/stores/$storeId?userId=${id.value}");
     } catch (e) {
       print("오류 : $e");
     }

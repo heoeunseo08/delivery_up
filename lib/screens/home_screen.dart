@@ -1,4 +1,6 @@
 import 'package:delivery_up/controller/store_controller.dart';
+import 'package:delivery_up/model/store_list_model.dart';
+import 'package:delivery_up/screens/detail_screen.dart';
 import 'package:delivery_up/utils/info.dart';
 import 'package:delivery_up/utils/widget.dart';
 import 'package:flutter/material.dart';
@@ -183,54 +185,162 @@ class _HomeScreenState extends State<HomeScreen> {
     showModalBottomSheet(
       context: context,
       builder: (context) => StatefulBuilder(
-          builder: (context, set) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(width: MediaQuery.widthOf(context)),
-                  SizedBox(height: 20),
-                  header(),
-                  titleText("정렬"),
-                  SizedBox(height: 8),
-                  ...List.generate(
-                    sortText.length,
-                    (index) {
-                      return RadioListTile(
-                        activeColor: mainColor,
-                        title: Text(sortText[index]),
-                        groupValue: tempSort,
-                        value: sortCode[index],
-                        onChanged: (value) => set(() => tempSort = value!),
-                      );
-                    },
-                  ),
+        builder: (context, set) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(width: MediaQuery.widthOf(context)),
                 SizedBox(height: 20),
-                  buttons(context: context, text: "적용하기", onTap: () async{
-                    if(tempSort == storeController.sort){
+                header(),
+                titleText("정렬"),
+                SizedBox(height: 8),
+                ...List.generate(
+                  sortText.length,
+                  (index) {
+                    return RadioListTile(
+                      activeColor: mainColor,
+                      title: Text(sortText[index]),
+                      groupValue: tempSort,
+                      value: sortCode[index],
+                      onChanged: (value) => set(() => tempSort = value!),
+                    );
+                  },
+                ),
+                SizedBox(height: 20),
+                buttons(
+                  context: context,
+                  text: "적용하기",
+                  onTap: () async {
+                    if (tempSort == storeController.sort) {
                       Navigator.pop(context);
                       return;
                     }
                     storeController.sort = tempSort;
                     await storeController.loadList();
-                     Navigator.pop(context);
-                     setState(() {
-
-                     });
-                  }),
-                SizedBox(height: 50)
-                ],
-              ),
-            );
-          },
-        ),
+                    Navigator.pop(context);
+                    setState(() {});
+                  },
+                ),
+                SizedBox(height: 50),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget cards() {
-    return Container();
+    return storeController.isListLoading
+        ? loadingWidget()
+        : storeController.storeListModel.isEmpty
+        ? Text("조건에 맞는 가게가 없습니다.")
+        : Column(
+            children: List.generate(
+              storeController.storeListModel.length,
+              (index) {
+                final model = storeController.storeListModel[index];
+                return cardWidget(model);
+              },
+            ),
+          );
+  }
+
+  Widget cardWidget(StoreListModel model) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DetailScreen(storeId: model.id),
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: subColor, width: 1.5)),
+        ),
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadiusGeometry.circular(14),
+              child: Image.network(model.imageUrl, width: 100, height: 75),
+            ),
+            SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        model.name,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          await storeController.setHeart(model.id);
+                          setState(() {});
+                        },
+                        child: Icon(
+                          model.favorite
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: model.favorite ? Colors.red : subColor,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        "${model.rating}",
+                        style: TextStyle(
+                          color: mainColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Icon(
+                        Icons.star_purple500_outlined,
+                        size: 20,
+                        color: mainColor,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "최소 ${model.minOrderPrice}원",
+                        style: TextStyle(
+                          color: subColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "배달 ${model.deliveryFee}원",
+                    style: TextStyle(
+                      color: subColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
