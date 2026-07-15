@@ -99,87 +99,96 @@ class _AddressScreenState extends State<AddressScreen> {
   }
 
   Widget addressWidget(AddressModel model) {
-    return Container(
-      padding: EdgeInsets.only(top: 14),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: subColor.withOpacity(0.5), width: 1.5),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.location_on_outlined, color: mainColor, size: 30),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          addressTitle(model),
-                          style: TextStyle(
-                            color: mainColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        model.isDefault
-                            ? Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: mainColor.withOpacity(0.2),
-                                  borderRadius: .circular(99),
-                                ),
-                                child: Text(
-                                  "대표",
-                                  style: TextStyle(
-                                    color: mainColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              )
-                            : Container(),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Icon(
-                        CupertinoIcons.delete_simple,
-                        color: subColor,
-                        size: 25,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Text(
-                  model.address,
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  model.addressDetail,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: subColor,
-                  ),
-                ),
-                SizedBox(height: 12),
-              ],
-            ),
+    return GestureDetector(
+      onTap: () {
+        addressController.setDefault(model.id);
+        setState(() {});
+      },
+      child: Container(
+        padding: EdgeInsets.only(top: 14),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: subColor.withOpacity(0.5), width: 1.5),
           ),
-        ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.location_on_outlined, color: mainColor, size: 30),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            addressTitle(model),
+                            style: TextStyle(
+                              color: mainColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          model.isDefault
+                              ? Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: mainColor.withOpacity(0.2),
+                                    borderRadius: .circular(99),
+                                  ),
+                                  child: Text(
+                                    "대표",
+                                    style: TextStyle(
+                                      color: mainColor,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          addressController.removeAddress(model.id);
+                          setState(() {});
+                        },
+                        child: Icon(
+                          CupertinoIcons.delete_simple,
+                          color: subColor,
+                          size: 25,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    model.address,
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    model.addressDetail,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: subColor,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

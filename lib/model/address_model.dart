@@ -3,7 +3,7 @@ class AddressModel {
   final String label;
   final String address;
   final String addressDetail;
-  final bool isDefault;
+   bool isDefault;
 
   AddressModel({
     required this.id,

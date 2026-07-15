@@ -80,10 +80,8 @@ class AddressController {
   void removeAddress(int addressId)=> models.removeWhere((element) => element.id == addressId);
 
    void setDefault(int addressId) {
-     models = models.map((e) {
-       if(e.id == addressId){
-         return AddressModel(id: id, label: label, address: address, addressDetail: addressDetail, isDefault: isDefault)
-       }
-     },).toList();
+     for(final i in models){
+       i.isDefault = i.id == addressId;
+     }
    }
 }
