@@ -88,10 +88,20 @@ class StoreController {
 
     try {
       final uri = Uri.parse("$baseUrl/stores/$storeId?userId=${id.value}");
+      final res = await http.get(
+        uri,
+        headers: {"Authorization": "Bearer $tkn"},
+      );
+      print(res.statusCode);
+      print(res.body);
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        detailModel = StoreDetailModel.fromJson(data['data']);
+      }
     } catch (e) {
       print("오류 : $e");
     }
-
     isDetailLoading = false;
   }
 }

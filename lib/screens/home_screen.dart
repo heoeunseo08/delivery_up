@@ -302,6 +302,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 4),
                   Row(
                     children: [
+                      Icon(
+                        Icons.star_purple500_outlined,
+                        size: 20,
+                        color: mainColor,
+                      ),
                       Text(
                         "${model.rating}",
                         style: TextStyle(
@@ -309,11 +314,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
-                      ),
-                      Icon(
-                        Icons.star_purple500_outlined,
-                        size: 20,
-                        color: mainColor,
                       ),
                       SizedBox(width: 10),
                       Text(
