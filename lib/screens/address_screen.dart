@@ -1,4 +1,5 @@
 import 'package:delivery_up/controller/address_controller.dart';
+import 'package:delivery_up/controller/method_controller.dart';
 import 'package:delivery_up/model/address_model.dart';
 import 'package:delivery_up/utils/info.dart';
 import 'package:delivery_up/utils/widget.dart';
@@ -14,6 +15,17 @@ class AddressScreen extends StatefulWidget {
 
 class _AddressScreenState extends State<AddressScreen> {
   AddressController addressController = AddressController();
+  TextEditingController addressTextController = TextEditingController();
+  TextEditingController addressDetailController = TextEditingController();
+
+  int selectIndex = 0;
+
+  @override
+  void dispose() {
+    addressTextController.dispose();
+    addressDetailController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -56,7 +68,10 @@ class _AddressScreenState extends State<AddressScreen> {
                   ),
                   SizedBox(height: 20),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () async {
+                      await showAddressSheet();
+                      setState(() {});
+                    },
                     child: Container(
                       alignment: Alignment.center,
                       width: MediaQuery.widthOf(context),
@@ -95,7 +110,7 @@ class _AddressScreenState extends State<AddressScreen> {
         return addressController.addressLabels[i];
       }
     }
-    return "";
+    return model.label;
   }
 
   Widget addressWidget(AddressModel model) {
@@ -189,6 +204,152 @@ class _AddressScreenState extends State<AddressScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> showAddressSheet() async {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, set) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 20),
+                titleText("배송지 추가"),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Text(
+                      "주소",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      "*",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4),
+                TextField(
+                  controller: addressTextController,
+                  decoration: InputDecoration(
+                    border: border,
+                    disabledBorder: border,
+                    focusedBorder: border,
+                    enabledBorder: border,
+                    hint: hintTexts("예) 서울시 강남구 테헤란로123"),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 16,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24),
+                Text(
+                  "상세주소",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 4),
+                TextField(
+                  controller: addressDetailController,
+                  decoration: InputDecoration(
+                    border: border,
+                    disabledBorder: border,
+                    focusedBorder: border,
+                    enabledBorder: border,
+                    hint: hintTexts("동·호수를 입력하세요 (최대 50자)"),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 16,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24),
+                Text(
+                  "라벨",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 24),
+                Wrap(
+                  children: List.generate(
+                    addressController.addressLabels.length,
+                    (index) {
+                      final label = addressController.addressLabels[index];
+                      bool select =
+                          label == addressController.addressLabels[selectIndex];
+                      return GestureDetector(
+                        onTap: () => set(() => selectIndex = index),
+                        child: Container(
+                          margin: EdgeInsets.only(right: 6),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: select
+                                ? mainColor
+                                : subColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                          child: Text(
+                            label,
+                            style: TextStyle(
+                              color: select ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 24),
+                buttons(
+                  context: context,
+                  text: "저장",
+                  onTap: () async {
+                    if (addressTextController.text.isEmpty) {
+                      showMessage("주소를 입력새주세요.");
+                      return;
+                    }
+                    if (addressDetailController.text.length > 50) {
+                      showMessage("최대 50자 까지만 입력할 수 있습니다.");
+                      return;
+                    }
+                    await addressController.addAddress(
+                      addressText: addressTextController.text.trim(),
+                      addressDetailText: addressDetailController.text.trim(),
+                      labelText: addressController.addressLabels[selectIndex],
+                    );
+                    await addressController.loadAddress();
+                    setState(() {});
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
