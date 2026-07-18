@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-String baseUrl = "http://10.0.2.2:8080";
+String baseUrl = "http://madkr.tplinkdns.com:8080";
 String tkn = "";
 
 bool get isLogin => tkn.isNotEmpty;
@@ -41,4 +41,20 @@ class Keys {
   static const String tab_heart_again = "tab_heart_again";
   static const String tab_menu = "tab_menu";
   static const String tab_cart = "tab_cart";
+
+  static const String login_email = "login_email";
+  static const String login_password = "login_password";
+  static const String sort_open = "sort_open";
+  static const String sort_apply = "sort_apply";
+  static const String menu_qty_plus = "menu_qty_plus";
+  static const String menu_addcart = "menu_addcart";
+  static const String cart_qty_plus = "cart_qty_plus";
+  static const String cart_qty_minus = "cart_qty_minus";
+  static const String cart_order = "cart_order";
+  static const String profile_address = "profile_address";
+  static const String address_add = "address_add";
+  static const String address_text = "address_text";
+  static const String address_save = "address_save";
+  static const String profile_check_logout = "profile_check_logout";
+  static const String profile_logout = "profile_logout";
 }

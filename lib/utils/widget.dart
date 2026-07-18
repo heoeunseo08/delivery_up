@@ -30,11 +30,13 @@ Widget header() {
 }
 
 Widget buttons({
+  Key? key,
   required BuildContext context,
   required String text,
   required GestureTapCallback onTap,
 }) {
   return GestureDetector(
+    key: key,
     onTap: onTap,
     child: Container(
       alignment: Alignment.center,

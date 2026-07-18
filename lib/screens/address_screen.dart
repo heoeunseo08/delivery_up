@@ -68,6 +68,7 @@ class _AddressScreenState extends State<AddressScreen> {
                   ),
                   SizedBox(height: 20),
                   GestureDetector(
+                    key: Key(Keys.address_add),
                     onTap: () async {
                       await showAddressSheet();
                       setState(() {});
@@ -244,6 +245,7 @@ class _AddressScreenState extends State<AddressScreen> {
                 ),
                 SizedBox(height: 4),
                 TextField(
+                  key: Key(Keys.address_text),
                   controller: addressTextController,
                   decoration: InputDecoration(
                     border: border,
@@ -325,6 +327,7 @@ class _AddressScreenState extends State<AddressScreen> {
                 ),
                 SizedBox(height: 24),
                 buttons(
+                  key: Key(Keys.address_save),
                   context: context,
                   text: "저장",
                   onTap: () async {

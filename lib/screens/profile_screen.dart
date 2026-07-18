@@ -28,9 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     imageController.load().then(
-      (value) {
-        if (mounted) setState(() {});
-      },
+      (value) => setState(() {}),
     );
     if (isLogin) load();
   }
@@ -151,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> imagePick() async {
-final list = [
+    final list = [
       "카메라로 촬영",
       "갤러리에서 선택",
       if (imageController.imagePath != null) "프로필 사진 삭제",
@@ -164,12 +162,13 @@ final list = [
         children: list
             .map(
               (e) => GestureDetector(
-                onTap: () => Navigator.pop(context,e),
+                onTap: () => Navigator.pop(context, e),
                 child: Container(
-                    width: MediaQuery.widthOf(context),
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    alignment: Alignment.center,
-                    child: Text(e)),
+                  width: MediaQuery.widthOf(context),
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  alignment: Alignment.center,
+                  child: Text(e),
+                ),
               ),
             )
             .toList(),
@@ -239,6 +238,7 @@ final list = [
       child: Column(
         children: [
           buttonItem(
+            key: Key(Keys.profile_address),
             icons: Icons.location_on_outlined,
             text: "배송지 관리",
             onTap: () {
@@ -278,11 +278,13 @@ final list = [
   }
 
   Widget buttonItem({
+    Key? key,
     required IconData icons,
     required String text,
     required GestureTapCallback? onTap,
   }) {
     return GestureDetector(
+      key: key,
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12),
@@ -326,6 +328,7 @@ final list = [
 
   Widget logoutText() {
     return GestureDetector(
+      key: Key(Keys.profile_check_logout),
       onTap: () => logoutPopup(),
       child: Text(
         "로그아웃",
@@ -385,6 +388,7 @@ final list = [
               ),
               SizedBox(width: 20),
               GestureDetector(
+                key: Key(Keys.profile_logout),
                 onTap: () async {
                   await authController.logout();
                   showMessage("로그아웃 되었습니다.");
@@ -442,6 +446,7 @@ final list = [
         ),
         SizedBox(height: 15),
         GestureDetector(
+          key: Key(Keys.button_login),
           onTap: () async {
             await showLogin(context);
             await load();

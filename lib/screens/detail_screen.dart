@@ -1,3 +1,5 @@
+import 'package:delivery_up/controller/cart_controller.dart';
+import 'package:delivery_up/controller/method_controller.dart';
 import 'package:delivery_up/controller/store_controller.dart';
 import 'package:delivery_up/model/store_detail_model.dart';
 import 'package:delivery_up/screens/cart_screen.dart';
@@ -16,7 +18,6 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   StoreController storeController = StoreController();
-  ValueNotifier<int> totalPrice = ValueNotifier(0);
 
   @override
   void initState() {
@@ -55,14 +56,18 @@ class _DetailScreenState extends State<DetailScreen> {
                               fontWeight: FontWeight.w800,
                             ),
                           ),
-                          ...storeController.detailModel!.menus
-                              .map((e) => cardWidget(e))
-                              .toList(),
+                          ...List.generate(
+                            storeController.detailModel!.menus.length,
+                            (index) => cardWidget(
+                              storeController.detailModel!.menus[index],
+                              index == 0,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  if (totalPrice.value > 0) cartButton(),
+                  if (cartController.totalPrice > 0) cartButton(),
                 ],
               ),
             ),
@@ -85,6 +90,7 @@ class _DetailScreenState extends State<DetailScreen> {
               : storeController.detailModel!.name,
         ),
         GestureDetector(
+          key: Key(Keys.tab_heart_on),
           onTap: () async {
             await storeController.setHeart(widget.storeId);
             setState(() {});
@@ -161,9 +167,10 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-  Widget cardWidget(MenusModel model) {
+  Widget cardWidget(MenusModel model, [bool isFirst = false]) {
     return GestureDetector(
-      onTap: () => addCartSheet(model),
+      key: isFirst ? Key(Keys.tab_menu) : null,
+      onTap: () => checkCart(model),
       child: Container(
         decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: subColor, width: 1.5)),
@@ -221,6 +228,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget cartButton() {
     return GestureDetector(
+      key: Key(Keys.tab_cart),
       onTap: () {
         Navigator.push(
           context,
@@ -243,23 +251,46 @@ class _DetailScreenState extends State<DetailScreen> {
           children: [
             Icon(Icons.article_outlined, color: Colors.white, size: 30),
             SizedBox(width: 12),
-            ValueListenableBuilder(
-              valueListenable: totalPrice,
-              builder: (context, value, child) {
-                return Text(
-                  "장바구니 보기 · ${totalPrice.value}원",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                );
-              },
+            Text(
+              "장바구니 보기 · ${cartController.totalPrice}원",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void checkCart(MenusModel model) {
+    if (cartController.anotherStore(widget.storeId)) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("장바구니 초기화"),
+          content: Text("다른 가게의 메뉴를 담으려 할 경우 장바구니 초기화됩니다."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("취소"),
+            ),
+            TextButton(
+              onPressed: () {
+                cartController.clear();
+                Navigator.pop(context);
+                addCartSheet(model);
+              },
+              child: Text("확인"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+    addCartSheet(model);
   }
 
   void addCartSheet(MenusModel model) {
@@ -389,6 +420,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           ),
                         ),
                         IconButton(
+                          key: Key(Keys.menu_qty_plus),
                           icon: Icon(
                             Icons.add_circle_outline,
                             color: mainColor,
@@ -401,31 +433,56 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 SizedBox(height: 12),
                 buttons(
+                  key: Key(Keys.menu_addcart),
                   context: context,
-                  text: "주문하기",
+                  text: "담기",
                   onTap: () {
                     final requiredMissing = model.options
                         .where((g) => g.required)
                         .any((g) => select[g.group]!.isEmpty);
 
                     if (requiredMissing) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("필수 옵션을 선택해주세요.")),
-                      );
+                      showMessage("필수 옵션을 선택해주세요.");
                       return;
                     }
 
                     int itemPrice = model.price;
+                    final optionIds = <int>[];
+                    final optionNames = <String>[];
+
                     for (final group in model.options) {
                       for (final item in group.items) {
                         if (select[group.group]!.contains(item.id)) {
                           itemPrice += item.price;
+                          optionIds.add(item.id);
+                          optionNames.add(item.name);
                         }
                       }
                     }
 
+                    if (cartController.storeId == null) {
+                      cartController.set(
+                        storeId: widget.storeId,
+                        storeName: storeController.detailModel!.name,
+                        minPrice: storeController.detailModel!.minOrderPrice,
+                        fee: storeController.detailModel!.deliveryFee,
+                      );
+                    }
+
+                    cartController.add(
+                      cartItem(
+                        menuId: model.id,
+                        menuName: model.name,
+                        imageUrl: model.imageUrl,
+                        optionNames: optionNames,
+                        optionIds: optionIds,
+                        unitPrice: itemPrice,
+                        quantity: currentIndex,
+                      ),
+                    );
+
                     Navigator.pop(context);
-                    totalPrice.value += itemPrice * currentIndex;
+                    setState(() {});
                   },
                 ),
               ],

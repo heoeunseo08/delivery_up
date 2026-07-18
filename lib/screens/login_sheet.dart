@@ -45,6 +45,7 @@ class _LoginSheetState extends State<LoginSheet> {
           fields(),
           SizedBox(height: 24),
           buttons(
+            key: Key(Keys.try_login),
             context: context,
             text: "로그인",
             onTap: () async {
@@ -87,6 +88,7 @@ class _LoginSheetState extends State<LoginSheet> {
         ),
         SizedBox(height: 4),
         TextField(
+          key: Key(Keys.login_email),
           controller: emailController,
           decoration: InputDecoration(
             border: border,
@@ -107,6 +109,7 @@ class _LoginSheetState extends State<LoginSheet> {
         ),
         SizedBox(height: 4),
         TextField(
+          key: Key(Keys.login_password),
           controller: passwordController,
           obscureText: true,
           decoration: InputDecoration(

@@ -23,10 +23,10 @@ class _AppScreenState extends State<AppScreen> {
   ];
 
   List<Icon> icons = [
-    Icon(Icons.home_outlined),
+    Icon(Icons.home_outlined, key: Key(Keys.tab_home)),
     Icon(Icons.search),
     Icon(Icons.article_outlined),
-    Icon(Icons.person_outline),
+    Icon(Icons.person_outline, key: Key(Keys.tab_profile)),
   ];
 
   List<String> labels = ["홈", "검색", "주문내역", "프로필"];

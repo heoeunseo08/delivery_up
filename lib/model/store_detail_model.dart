@@ -5,6 +5,7 @@ class StoreDetailModel {
   final double rating;
   final int minOrderPrice;
   final int deliveryFee;
+  final String category;
   bool favorite;
   final List<MenusModel> menus;
 
@@ -15,6 +16,7 @@ class StoreDetailModel {
     required this.rating,
     required this.minOrderPrice,
     required this.deliveryFee,
+    required this.category,
     required this.favorite,
     required this.menus,
   });
@@ -27,6 +29,7 @@ class StoreDetailModel {
         rating: json["rating"],
         minOrderPrice: json["minOrderPrice"],
         deliveryFee: json["deliveryFee"],
+        category: json["category"],
         favorite: json["favorite"],
         menus: (json["menus"] as List)
             .map((e) => MenusModel.fromJson(e))

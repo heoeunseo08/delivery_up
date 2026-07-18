@@ -116,6 +116,11 @@ class _HomeScreenState extends State<HomeScreen> {
           return Padding(
             padding: EdgeInsets.only(left: 8),
             child: FilterChip(
+              key: code == 'CHICKEN'
+                  ? Key(Keys.tab_chicken)
+                  : code == 'BUNSIK'
+                  ? Key(Keys.tab_snack)
+                  : null,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(99),
               ),
@@ -155,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ? "필터"
             : "${storeController.category.length}개 선택됨";
         return InkWell(
+          key: Key(Keys.sort_open),
           onTap: showSort,
           child: Row(
             children: [
@@ -202,6 +208,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   sortText.length,
                   (index) {
                     return RadioListTile(
+                      key: sortCode[index] == 'RATING'
+                          ? Key(Keys.tab_star)
+                          : null,
                       activeColor: mainColor,
                       title: Text(sortText[index]),
                       groupValue: tempSort,
@@ -212,6 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 20),
                 buttons(
+                  key: Key(Keys.sort_apply),
                   context: context,
                   text: "적용하기",
                   onTap: () async {
@@ -244,14 +254,15 @@ class _HomeScreenState extends State<HomeScreen> {
               storeController.storeListModel.length,
               (index) {
                 final model = storeController.storeListModel[index];
-                return cardWidget(model);
+                return cardWidget(model, index == 0);
               },
             ),
           );
   }
 
-  Widget cardWidget(StoreListModel model) {
+  Widget cardWidget(StoreListModel model, [bool isFirst = false]) {
     return GestureDetector(
+      key: isFirst ? Key(Keys.tab_frist_card) : null,
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
@@ -329,6 +340,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 4),
                   Text(
                     "배달 ${model.deliveryFee}원",
+                    style: TextStyle(
+                      color: subColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    model.category,
                     style: TextStyle(
                       color: subColor,
                       fontSize: 14,
