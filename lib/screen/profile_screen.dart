@@ -39,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> loadImage() async {
-    await imageController.load();
+    await imageController.profileLoad();
     setState(() {});
   }
 
@@ -98,9 +98,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         GestureDetector(
           onTap: () => pickImage(),
           child: ClipOval(
-            child: imageController.path != null
+            child: imageController.profilePath != null
                 ? Image.file(
-                    File(imageController.path!),
+                    File(imageController.profilePath!),
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
@@ -163,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SizedBox(width: MediaQuery.widthOf(context)),
             TextButton(
               onPressed: () async {
-                await imageController.pick(ImageSource.camera);
+                await imageController.profilePick(ImageSource.camera);
                 loadImage();
                 setState(() {});
               },
@@ -171,16 +171,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             TextButton(
               onPressed: () async {
-                await imageController.pick(ImageSource.gallery);
+                await imageController.profilePick(ImageSource.gallery);
                 loadImage();
                 setState(() {});
               },
               child: Text("갤러리에서 선택"),
             ),
-            if (imageController.path != null)
+            if (imageController.profilePath != null)
               TextButton(
                 onPressed: () async {
-                  await imageController.remove();
+                  await imageController.profileRemove();
                   setState(() {});
                 },
                 child: Text("프로필 사진 삭제"),
