@@ -2,7 +2,7 @@ import 'package:delivery_up_test4/controller/address_controller.dart';
 import 'package:delivery_up_test4/controller/cart_controller.dart';
 import 'package:delivery_up_test4/controller/method_controller.dart';
 import 'package:delivery_up_test4/controller/order_controller.dart';
-import 'package:delivery_up_test4/screen/log_screen.dart';
+import 'package:delivery_up_test4/screen/app_screen.dart';
 import 'package:delivery_up_test4/utils/info.dart';
 import 'package:flutter/material.dart';
 
@@ -107,7 +107,7 @@ class _CartScreenState extends State<CartScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         GestureDetector(
-                          // key: index == 0 ? Key(Keys.cart_qty_minus) : null,
+                          key: Keys.step17,
                           onTap: () {
                             cartController.updateUpDown(index, false);
                             setState(() {});
@@ -145,7 +145,7 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                         ),
                         GestureDetector(
-                          // key: index == 0 ? Key(Keys.cart_qty_plus) : null,
+                          key: Keys.step16,
                           onTap: () {
                             cartController.updateUpDown(index, true);
                             setState(() {});
@@ -218,7 +218,7 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget orderButton() {
     return GestureDetector(
-      // key: Key(Keys.cart_order),
+      key: Keys.step18,
       onTap: () async {
         AddressController addressController = AddressController();
         await addressController.loadAddress();
@@ -246,7 +246,7 @@ class _CartScreenState extends State<CartScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => LogScreen(),
+            builder: (context) => AppScreen(initIndex: 2),
           ),
         );
       },

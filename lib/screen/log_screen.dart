@@ -59,7 +59,7 @@ class _LogScreenState extends State<LogScreen> {
                   orderController.models.length,
                   (index) {
                     final model = orderController.models[index];
-                    return card(model);
+                    return card(model, isFirst: index == 0);
                   },
                 ),
               ),
@@ -67,7 +67,7 @@ class _LogScreenState extends State<LogScreen> {
     );
   }
 
-  Widget card(OrderModel model) {
+  Widget card(OrderModel model, {bool isFirst = false}) {
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -123,6 +123,7 @@ class _LogScreenState extends State<LogScreen> {
               ),
               SizedBox(width: 20),
               GestureDetector(
+                key: isFirst ? Keys.step20 : null,
                 onTap: () async {
                   await showReviewSheet(model);
                   setState(() {});
@@ -187,6 +188,7 @@ class _LogScreenState extends State<LogScreen> {
                     ),
                   ),
                   SizedBox(height: 20),
+
                   Row(
                     children: [
                       Text(
@@ -204,6 +206,7 @@ class _LogScreenState extends State<LogScreen> {
                     children: List.generate(
                       5,
                       (index) => GestureDetector(
+                        key: index == 4 ? Keys.step22_star : null,
                         onTap: () => set(() => rating = index + 1),
                         child: Icon(
                           Icons.star,
@@ -214,6 +217,7 @@ class _LogScreenState extends State<LogScreen> {
                     ),
                   ),
                   SizedBox(height: 20),
+
                   Text(
                     "사진 첨부",
                     style: TextStyle(
@@ -223,6 +227,7 @@ class _LogScreenState extends State<LogScreen> {
                   ),
                   SizedBox(height: 4),
                   GestureDetector(
+                    key: Keys.step21,
                     onTap: () async {
                       await imageController.reviewPick(ImageSource.gallery);
                       set(() {});
@@ -263,6 +268,7 @@ class _LogScreenState extends State<LogScreen> {
                   ),
                   SizedBox(height: 4),
                   TextFormField(
+                    key: Keys.step22_review,
                     controller: reviewTextController,
                     decoration: InputDecoration(
                       border: border,
@@ -278,6 +284,7 @@ class _LogScreenState extends State<LogScreen> {
                   ),
                   SizedBox(height: 24),
                   GestureDetector(
+                    key: Keys.step22_add,
                     onTap: () async {
                       if (rating == 0) {
                         showMessage("별점은 1정이상 입력해주세요");
@@ -292,8 +299,11 @@ class _LogScreenState extends State<LogScreen> {
                         rating: rating,
                         content: reviewTextController.text.trim(),
                       );
-                      if(imageController.reviewPath != null){
-                        await reviewController.reviewImage(reviewController.reviewId!, File(imageController.reviewPath!));
+                      if (imageController.reviewPath != null) {
+                        await reviewController.reviewImage(
+                          reviewController.reviewId!,
+                          File(imageController.reviewPath!),
+                        );
                       }
                       await load();
                       Navigator.pop(context);

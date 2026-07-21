@@ -1,4 +1,3 @@
-
 import 'package:delivery_up_test4/controller/store_controller.dart';
 import 'package:delivery_up_test4/model/store_list_model.dart';
 import 'package:delivery_up_test4/screen/detail_screen.dart';
@@ -61,24 +60,24 @@ class _HomeScreenState extends State<HomeScreen> {
           : storeController.isListLoading
           ? loading()
           : Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(height: 30),
-              fieldWidget(),
-              SizedBox(height: 30),
-              categoryWidget(),
-              SizedBox(height: 30),
-              sortWidget(),
-              SizedBox(height: 30),
-              cards(),
-              SizedBox(height: 30),
-            ],
-          ),
-        ),
-      ),
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 30),
+                    fieldWidget(),
+                    SizedBox(height: 30),
+                    categoryWidget(),
+                    SizedBox(height: 30),
+                    sortWidget(),
+                    SizedBox(height: 30),
+                    cards(),
+                    SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
@@ -98,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
         filled: true,
         fillColor: subColor.withOpacity(0.2),
         prefixIcon: Icon(Icons.search, size: 30, color: subColor),
-        hint: Text("가게·메뉴를 검색해보세요",style: TextStyle(color: subColor)),
+        hint: Text("가게·메뉴를 검색해보세요", style: TextStyle(color: subColor)),
       ),
     );
   }
@@ -118,11 +117,11 @@ class _HomeScreenState extends State<HomeScreen> {
           return Padding(
             padding: EdgeInsets.only(left: 8),
             child: FilterChip(
-              // key: code == 'CHICKEN'
-              //     ? Key(Keys.tab_chicken)
-              //     : code == 'BUNSIK'
-              //     ? Key(Keys.tab_snack)
-              //     : null,
+              key: code == 'CHICKEN'
+                  ? Keys.step6
+                  : code == 'BUNSIK'
+                  ? Keys.step7
+                  : null,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(99),
               ),
@@ -162,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ? "필터"
             : "${storeController.category.length}개 선택됨";
         return InkWell(
-          // key: Key(Keys.sort_open),
+          key: Keys.step8,
           onTap: showSort,
           child: Row(
             children: [
@@ -204,15 +203,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(width: MediaQuery.widthOf(context)),
                 SizedBox(height: 20),
                 headerBar(),
-                Text("정렬",style: TextStyle(fontSize: 18,fontWeight: FontWeight.w800),),
+                Text(
+                  "정렬",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                ),
                 SizedBox(height: 8),
                 ...List.generate(
                   sortText.length,
-                      (index) {
+                  (index) {
                     return RadioListTile(
-                      // key: sortCode[index] == 'RATING'
-                      //     ? Key(Keys.tab_star)
-                      //     : null,
+                      key: sortCode[index] == 'RATING'
+                          ? Keys.step8_star
+                          : null,
                       activeColor: mainColor,
                       title: Text(sortText[index]),
                       groupValue: tempSort,
@@ -223,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 20),
                 buttons(
-                  // key: Key(Keys.sort_apply),
+                  key: Keys.step8_sort,
                   context: context,
                   text: "적용하기",
                   onTap: () async {
@@ -252,19 +254,19 @@ class _HomeScreenState extends State<HomeScreen> {
         : storeController.storeListModels.isEmpty
         ? Text("조건에 맞는 가게가 없습니다.")
         : Column(
-      children: List.generate(
-        storeController.storeListModels.length,
-            (index) {
-          final model = storeController.storeListModels[index];
-          return cardWidget(model, index == 0);
-        },
-      ),
-    );
+            children: List.generate(
+              storeController.storeListModels.length,
+              (index) {
+                final model = storeController.storeListModels[index];
+                return cardWidget(model, index == 0);
+              },
+            ),
+          );
   }
 
   Widget cardWidget(StoreListModel model, [bool isFirst = false]) {
     return GestureDetector(
-      // key: isFirst ? Key(Keys.tab_frist_card) : null,
+      key: isFirst ? Keys.step9 : null,
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(

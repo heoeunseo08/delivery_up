@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:delivery_up_test4/utils/info.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -41,10 +43,19 @@ class ImageController {
 
   Future<void> reviewPick(ImageSource source) async {
     try{
+      final dir = await getApplicationDocumentsDirectory();
+
+      if(testMode){
+        final data = await rootBundle.load("assets/003. images/review_img.png");
+        final file = File('${dir.path}/review.jpg');
+        await file.writeAsBytes(data.buffer.asUint8List());
+        reviewPath = file.path;
+        return;
+      }
+
       final picked = await ImagePicker().pickImage(source: source);
       if(picked == null) return;
 
-      final dir = await getApplicationDocumentsDirectory();
       final save = await File(picked.path).copy('${dir.path}/review.jpg');
       reviewPath = save.path;
     }catch(e){

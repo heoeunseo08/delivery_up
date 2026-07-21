@@ -23,7 +23,6 @@ class _DetailScreenState extends State<DetailScreen> {
   void initState() {
     super.initState();
     load();
-
   }
 
   Future<void> load() async {
@@ -36,42 +35,31 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(),
-      body: storeController.isDetailLoading
+      body:
+          storeController.isDetailLoading ||
+              storeController.storeDetailModel == null
           ? loading()
           : Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    titleWidget(),
-                    Text(
-                      "인기 메뉴",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          titleWidget(),
+                          ...menuCategoryList(),
+                        ],
                       ),
                     ),
-                    ...List.generate(
-                      storeController.storeDetailModel!.menus.length,
-                          (index) => cardWidget(
-                        storeController.storeDetailModel!.menus[index],
-                        index == 0,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  if (cartController.totalPrice > 0) cartButton(),
+                ],
               ),
             ),
-            if (cartController.totalPrice > 0) cartButton(),
-          ],
-        ),
-      ),
     );
   }
 
@@ -91,7 +79,7 @@ class _DetailScreenState extends State<DetailScreen> {
               : storeController.storeDetailModel!.name,
         ),
         GestureDetector(
-          // key: Key(Keys.tab_heart_on),
+          key: Keys.step10,
           onTap: () async {
             await storeController.setHeart(widget.storeId);
             setState(() {});
@@ -168,9 +156,40 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
+  List<Widget> menuCategoryList() {
+    final menus = storeController.storeDetailModel!.menus;
+    final category = <String>[];
+    for (final m in menus) {
+      if (!category.contains(m.menuCategory)) category.add(m.menuCategory);
+    }
+    return category.expand(
+      (element) {
+        final items = menus.where((e) => e.menuCategory == element).toList();
+        return [
+          Text(
+            element,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+
+          ...List.generate(
+            items.length,
+            (index) => cardWidget(
+              items[index],
+              element == category.first && index == 0,
+            ),
+          ),
+          SizedBox(height: 20),
+        ];
+      },
+    ).toList();
+  }
+
   Widget cardWidget(MenusModel model, [bool isFirst = false]) {
     return GestureDetector(
-      // key: isFirst ? Key(Keys.tab_menu) : null,
+      key: isFirst ? Keys.step13 : null,
       onTap: () => checkCart(model),
       child: Container(
         decoration: BoxDecoration(
@@ -229,7 +248,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget cartButton() {
     return GestureDetector(
-      // key: Key(Keys.tab_cart),
+      key: Keys.step15,
       onTap: () {
         Navigator.push(
           context,
@@ -311,7 +330,10 @@ class _DetailScreenState extends State<DetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 headerBar(),
-                Text(model.name,style: TextStyle(fontWeight: FontWeight.w800,fontSize: 20),),
+                Text(
+                  model.name,
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+                ),
                 Text(
                   "${model.price}원",
                   style: TextStyle(
@@ -422,7 +444,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           ),
                         ),
                         IconButton(
-                          // key: Key(Keys.menu_qty_plus),
+                          key: Keys.step14_up,
                           icon: Icon(
                             Icons.add_circle_outline,
                             color: mainColor,
@@ -435,7 +457,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
                 SizedBox(height: 12),
                 buttons(
-                  // key: Key(Keys.menu_addcart),
+                  key: Keys.step14_add,
                   context: context,
                   text: "담기",
                   onTap: () {
@@ -466,7 +488,8 @@ class _DetailScreenState extends State<DetailScreen> {
                       cartController.set(
                         storeId: widget.storeId,
                         storeName: storeController.storeDetailModel!.name,
-                        minPrice: storeController.storeDetailModel!.minOrderPrice,
+                        minPrice:
+                            storeController.storeDetailModel!.minOrderPrice,
                         fee: storeController.storeDetailModel!.deliveryFee,
                       );
                     }

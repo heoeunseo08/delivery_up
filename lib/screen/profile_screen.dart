@@ -58,6 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 moreButtons(),
                 SizedBox(height: 30),
                 GestureDetector(
+                  key: Keys.step27,
                   onTap: () => checkLogout(),
                   child: Text("로그아웃"),
                 ),
@@ -79,9 +80,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Text("취소"),
           ),
           GestureDetector(
+            key: Keys.step28,
             onTap: () async {
               await authController.logout();
               setState(() {});
+              showMessage("로그아웃 되었습니다");
               Navigator.pop(context);
             },
             child: Text("확인"),
@@ -288,6 +291,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       spacing: 12,
       children: [
         GestureDetector(
+          key: Keys.step24,
           onTap: () {
             Navigator.push(
               context,
@@ -346,6 +350,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             SizedBox(height: 4),
             TextFormField(
+              key: Keys.step4_email,
               controller: email_controller,
               decoration: InputDecoration(
                 border: border,
@@ -365,6 +370,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             SizedBox(height: 4),
             TextFormField(
+              key: Keys.step4_password,
               controller: password_controller,
               decoration: InputDecoration(
                 border: border,
@@ -379,6 +385,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             SizedBox(height: 24),
             GestureDetector(
+              key: Keys.step4,
               onTap: () async {
                 await authController.login(
                   emailText: email_controller.text,
@@ -424,6 +431,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Text("로그인 후 배달 서비스를 이용할 수 있어요"),
         SizedBox(height: 20),
         GestureDetector(
+          key: Keys.step3,
           onTap: () async {
             await loginSheet();
             load();

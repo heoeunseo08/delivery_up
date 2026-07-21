@@ -45,7 +45,8 @@ class StoreController {
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         final data = jsonDecode(res.body)['data']['favorite'];
-        storeListModels[index].favorite = data;
+        if(index != -1) storeListModels[index].favorite = data;
+        if(storeDetailModel?.id == storeId) storeDetailModel!.favorite = data;
       }
     } catch (e) {
       print("error : $e");

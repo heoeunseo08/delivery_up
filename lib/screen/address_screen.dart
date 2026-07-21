@@ -70,7 +70,7 @@ class _AddressScreenState extends State<AddressScreen> {
         child: addressController.isLoading
             ? loading()
             : SingleChildScrollView(
-              child: Column(
+                child: Column(
                   children: [
                     ...List.generate(
                       addressController.models.length,
@@ -83,7 +83,7 @@ class _AddressScreenState extends State<AddressScreen> {
                     addButton(),
                   ],
                 ),
-            ),
+              ),
       ),
     );
   }
@@ -198,9 +198,9 @@ class _AddressScreenState extends State<AddressScreen> {
 
   Widget addButton() {
     return GestureDetector(
+      key: Keys.step25,
       onTap: () => addAddressSheet(),
       child: Container(
-        // key: ,
         alignment: AlignmentGeometry.center,
         width: MediaQuery.widthOf(context),
         padding: EdgeInsets.symmetric(vertical: 14),
@@ -259,6 +259,7 @@ class _AddressScreenState extends State<AddressScreen> {
                 ),
                 SizedBox(height: 4),
                 TextFormField(
+                  key: Keys.step26_address,
                   controller: address_controller,
                   decoration: InputDecoration(
                     border: border,
@@ -323,6 +324,7 @@ class _AddressScreenState extends State<AddressScreen> {
                 ),
                 SizedBox(height: 24),
                 GestureDetector(
+                  key: Keys.step26_add,
                   onTap: () async {
                     if (address_controller.text.isEmpty) {
                       showMessage("주소를 입력해주세요.");
@@ -339,6 +341,7 @@ class _AddressScreenState extends State<AddressScreen> {
                     );
                     await load();
                     Navigator.pop(context);
+                    if (testMode) Navigator.pop(context);
                   },
                   child: Container(
                     alignment: AlignmentGeometry.center,

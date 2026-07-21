@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.white,
         ),
       ),
-      home: const AppScreen(),
+      home: const AppScreen(initIndex: 0),
     );
   }
 }
